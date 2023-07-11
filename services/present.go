@@ -21,8 +21,8 @@ func (ps *PresentService) GetHomeWidget(token string) (models.HomeWidget, error)
 	return ps.repository.GetHomeWidget(token)
 }
 
-func (ps *PresentService) GetAll(token string) ([]models.Present, error) {
-	return ps.repository.GetAll(token)
+func (ps *PresentService) GetAll(token, period string) ([]models.Present, error) {
+	return ps.repository.GetAll(token, period)
 }
 
 func (ps *PresentService) GetByID(id, token string) (models.Present, error) {

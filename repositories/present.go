@@ -51,7 +51,7 @@ func (pr *PresentRepositoryImpl) GetHomeWidget(token string) (models.HomeWidget,
 	return homeWidget, nil
 }
 
-func (pr *PresentRepositoryImpl) GetAll(token string) ([]models.Present, error) {
+func (pr *PresentRepositoryImpl) GetAll(token, period string) ([]models.Present, error) {
 	var presents []models.Present
 
 	user, err := m.VerifyToken(token)
@@ -59,8 +59,20 @@ func (pr *PresentRepositoryImpl) GetAll(token string) ([]models.Present, error) 
 		return nil, err
 	}
 
-	if err := config.DB.Where("user_id = ?", user.ID).Preload("User").Find(&presents).Error; err != nil {
-		return nil, err
+	if period != "" {
+		startTime, err := helpers.GetPeriodTime(period)
+		if err != nil {
+			return nil, err
+		}
+		date := startTime.Format("2006-01-02")
+
+		if err := config.DB.Where("user_id = ? AND date >= ?", user.ID, date).Preload("User").Find(&presents).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := config.DB.Where("user_id = ?", user.ID).Preload("User").Find(&presents).Error; err != nil {
+			return nil, err
+		}
 	}
 
 	return presents, nil

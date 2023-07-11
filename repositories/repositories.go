@@ -14,7 +14,7 @@ type UserRepository interface {
 }
 
 type PresentRepository interface {
-	GetAll(token string) ([]models.Present, error)
+	GetAll(token, period string) ([]models.Present, error)
 	GetByID(id, token string) (models.Present, error)
 	GetHomeWidget(token string) (models.HomeWidget, error)
 	Search(date time.Time, token string) ([]models.Present, error)

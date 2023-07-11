@@ -57,7 +57,9 @@ func (pc *PresentController) GetAll(c echo.Context) error {
 	}
 	token = strings.ReplaceAll(token, "Bearer ", "")
 
-	presents, err := pc.service.GetAll(token)
+	period := c.QueryParam("period")
+
+	presents, err := pc.service.GetAll(token, period)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response[string]{
