@@ -2,11 +2,16 @@ package route
 
 import (
 	"absen/controllers"
+	adm "absen/controllers/admin"
 	m "absen/middleware"
 	"absen/utils"
 
 	"github.com/labstack/echo/v4"
 	mid "github.com/labstack/echo/v4/middleware"
+)
+
+var (
+	JWT_SECRET_KEY = utils.GetConfig("JWT_SECRET_KEY")
 )
 
 func New() *echo.Echo {
@@ -21,7 +26,7 @@ func New() *echo.Echo {
 
 	v1 := e.Group("/api/v1")
 	eJwt := v1.Group("")
-	eJwt.Use(mid.JWT([]byte(utils.GetConfig("JWT_SECRET_KEY"))))
+	eJwt.Use(mid.JWT([]byte(JWT_SECRET_KEY)))
 
 	// Route / to handler function
 	user := controllers.InitUserController()
@@ -36,6 +41,15 @@ func New() *echo.Echo {
 	eJwt.GET("/presents/user/:id", present.GetByID)
 	eJwt.GET("/presents", present.Search)
 	eJwt.POST("/presents", present.Create)
+
+	admin := v1.Group("/admin")
+	admin.Use(mid.JWT([]byte(JWT_SECRET_KEY)))
+	adminUser := adm.InitAdminUserController()
+	admin.GET("/users", adminUser.GetAll)
+	admin.GET("/users/:id", adminUser.GetByID)
+	admin.POST("/users", adminUser.Create)
+	admin.PUT("/users/:id", adminUser.Update)
+	admin.DELETE("/users/:id", adminUser.Delete)
 
 	return e
 }
