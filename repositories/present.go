@@ -136,13 +136,22 @@ func (pr *PresentRepositoryImpl) Create(presentInput models.PresentInput, token 
 		return models.Present{}, err
 	}
 
+	status := int8(0)
+	if checkInTime.After(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 12, 0, 0, 0, checkInTime.Location())) {
+		status = 1
+	}
+
 	var count int64
-	if err := config.DB.Model(&models.Present{}).Where("date = ? AND user_id = ?", presentInput.DateInput, user.ID).Count(&count).Error; err != nil {
+	if err := config.DB.Model(&models.Present{}).Where("date = ? AND status = ? AND user_id = ?", presentInput.DateInput, status, user.ID).Count(&count).Error; err != nil {
 		return models.Present{}, err
 	}
 
 	if count > 0 {
-		return models.Present{}, errors.New("Kamu sudah absen")
+		if status == 0 {
+			return models.Present{}, errors.New("Kamu sudah absen masuk")
+		} else {
+			return models.Present{}, errors.New("Kamu sudah absen keluar")
+		}
 	}
 
 	var urls []string
@@ -178,6 +187,7 @@ func (pr *PresentRepositoryImpl) Create(presentInput models.PresentInput, token 
 		Longitude: presentInput.Longitude,
 		Latitude:  presentInput.Latitude,
 		Distance:  distanceFormatted,
+		Status:    status,
 		UserID:    user.ID,
 		User:      User,
 	}

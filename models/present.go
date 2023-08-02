@@ -16,6 +16,7 @@ type Present struct {
 	Longitude string         `json:"longitude" form:"longitude"`
 	Latitude  string         `json:"latitude" form:"latitude"`
 	Distance  string         `json:"distance" form:"distance"`
+	Status    int8           `json:"status" form:"status"`
 	UserID    uint           `json:"user_id" form:"user_id"`
 	User      User           `gorm:"foreignKey:UserID"`
 	CreatedAt time.Time      `json:"created_at"`
@@ -64,5 +65,6 @@ type PresentInput struct {
 	URL       string    `json:"url" form:"url"`
 	Longitude string    `json:"longitude" form:"longitude" validate:"required"`
 	Latitude  string    `json:"latitude" form:"latitude" validate:"required"`
+	Status    int8      `json:"status" form:"status"`
 	UserID    uint      `json:"user_id" form:"user_id"`
 }
