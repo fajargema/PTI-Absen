@@ -1,5 +1,6 @@
 package models
 
 type HomeWidget struct {
-	CheckInLast string
+	CheckInLast  string
+	CheckOutLast string
 }

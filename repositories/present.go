@@ -36,16 +36,32 @@ func (pr *PresentRepositoryImpl) GetHomeWidget(token string) (models.HomeWidget,
 	var presentIn models.Present
 	if err := config.DB.Preload("User").
 		Select("time").
-		Where("date = ? AND user_id = ?", nowFormat, user.ID).
+		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 0).
 		Order("time DESC").
 		First(&presentIn).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			homeWidget.CheckInLast = "belum ada"
+			homeWidget.CheckInLast = "belum absen"
 		} else {
 			return models.HomeWidget{}, err
 		}
 	} else {
 		homeWidget.CheckInLast = presentIn.Time.Format("15:04:05")
+	}
+
+	// Get Check-Out Last
+	var presentOut models.Present
+	if err := config.DB.Preload("User").
+		Select("time").
+		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 1).
+		Order("time DESC").
+		First(&presentOut).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			homeWidget.CheckOutLast = "belum absen"
+		} else {
+			return models.HomeWidget{}, err
+		}
+	} else {
+		homeWidget.CheckOutLast = presentOut.Time.Format("15:04:05")
 	}
 
 	return homeWidget, nil
