@@ -44,12 +44,18 @@ func New() *echo.Echo {
 
 	admin := v1.Group("/admin")
 	admin.Use(mid.JWT([]byte(JWT_SECRET_KEY)))
+
 	adminUser := adm.InitAdminUserController()
 	admin.GET("/users", adminUser.GetAll)
 	admin.GET("/users/:id", adminUser.GetByID)
 	admin.POST("/users", adminUser.Create)
 	admin.PUT("/users/:id", adminUser.Update)
 	admin.DELETE("/users/:id", adminUser.Delete)
+
+	adminPresent := adm.InitAdminPresentController()
+	admin.GET("/presents", adminPresent.GetAll)
+	admin.GET("/presents/:id", adminPresent.GetByID)
+	admin.GET("/presents/search", adminPresent.Search)
 
 	return e
 }
