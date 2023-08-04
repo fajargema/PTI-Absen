@@ -32,36 +32,132 @@ func (pr *PresentRepositoryImpl) GetHomeWidget(token string) (models.HomeWidget,
 	now := time.Now()
 	nowFormat := now.Format(layoutFormat)
 
-	// Get Check-In Last
-	var presentIn models.Present
+	// Get Check-In Time
+	var presentInTime models.Present
 	if err := config.DB.Preload("User").
 		Select("time").
 		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 0).
 		Order("time DESC").
-		First(&presentIn).Error; err != nil {
+		First(&presentInTime).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			homeWidget.CheckInLast = "belum absen"
+			homeWidget.CheckIn.Time = "belum absen"
 		} else {
 			return models.HomeWidget{}, err
 		}
 	} else {
-		homeWidget.CheckInLast = presentIn.Time.Format("15:04:05")
+		homeWidget.CheckIn.Time = presentInTime.Time.Format("15:04:05")
+	}
+
+	// Get Check-In Latitude
+	var presentInLat models.Present
+	if err := config.DB.Preload("User").
+		Select("latitude").
+		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 0).
+		Order("time DESC").
+		First(&presentInLat).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			homeWidget.CheckIn.Latitude = "belum absen"
+		} else {
+			return models.HomeWidget{}, err
+		}
+	} else {
+		homeWidget.CheckIn.Latitude = presentInLat.Latitude
+	}
+
+	// Get Check-In Longitude
+	var presentInLong models.Present
+	if err := config.DB.Preload("User").
+		Select("longitude").
+		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 0).
+		Order("time DESC").
+		First(&presentInLong).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			homeWidget.CheckIn.Longitude = "belum absen"
+		} else {
+			return models.HomeWidget{}, err
+		}
+	} else {
+		homeWidget.CheckIn.Longitude = presentInLong.Longitude
+	}
+
+	// Get Check-In Location
+	getCheckInLoc, err := helpers.GetLocation(presentInLat.Latitude, presentInLong.Longitude)
+	if err != nil {
+		return models.HomeWidget{}, err
+	}
+	var checkInLoc models.LocationDetails
+	err = json.Unmarshal([]byte(getCheckInLoc), &checkInLoc)
+	if err != nil {
+		return models.HomeWidget{}, err
+	}
+	if checkInLoc.DisplayName == "" {
+		homeWidget.CheckIn.Location = "belum absen"
+	} else {
+		homeWidget.CheckIn.Location = checkInLoc.DisplayName
 	}
 
 	// Get Check-Out Last
-	var presentOut models.Present
+	var presentOutTime models.Present
 	if err := config.DB.Preload("User").
 		Select("time").
 		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 1).
 		Order("time DESC").
-		First(&presentOut).Error; err != nil {
+		First(&presentOutTime).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			homeWidget.CheckOutLast = "belum absen"
+			homeWidget.CheckOut.Time = "belum absen"
 		} else {
 			return models.HomeWidget{}, err
 		}
 	} else {
-		homeWidget.CheckOutLast = presentOut.Time.Format("15:04:05")
+		homeWidget.CheckOut.Time = presentOutTime.Time.Format("15:04:05")
+	}
+
+	// Get Check-In Latitude
+	var presentOutLat models.Present
+	if err := config.DB.Preload("User").
+		Select("latitude").
+		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 1).
+		Order("time DESC").
+		First(&presentOutLat).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			homeWidget.CheckOut.Latitude = "belum absen"
+		} else {
+			return models.HomeWidget{}, err
+		}
+	} else {
+		homeWidget.CheckOut.Latitude = presentOutLat.Latitude
+	}
+
+	// Get Check-In Longitude
+	var presentOutLong models.Present
+	if err := config.DB.Preload("User").
+		Select("longitude").
+		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 1).
+		Order("time DESC").
+		First(&presentOutLong).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			homeWidget.CheckOut.Longitude = "belum absen"
+		} else {
+			return models.HomeWidget{}, err
+		}
+	} else {
+		homeWidget.CheckOut.Longitude = presentOutLong.Longitude
+	}
+
+	// Get Check-Out Location
+	getCheckOutLoc, err := helpers.GetLocation(presentOutLat.Latitude, presentOutLong.Longitude)
+	if err != nil {
+		return models.HomeWidget{}, err
+	}
+	var checkOutLoc models.LocationDetails
+	err = json.Unmarshal([]byte(getCheckOutLoc), &checkOutLoc)
+	if err != nil {
+		return models.HomeWidget{}, err
+	}
+	if checkOutLoc.DisplayName == "" {
+		homeWidget.CheckOut.Location = "belum absen"
+	} else {
+		homeWidget.CheckOut.Location = checkOutLoc.DisplayName
 	}
 
 	return homeWidget, nil
