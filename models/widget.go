@@ -19,6 +19,11 @@ type CheckOut struct {
 	Location  string `json:"location"`
 }
 
-type LocationDetails struct {
-	DisplayName string `json:"display_name"`
+type GeocodingResponse struct {
+	Results []Results `json:"results"`
+	Status  string    `json:"status"`
+}
+
+type Results struct {
+	FormattedAddress string `json:"formatted_address"`
 }

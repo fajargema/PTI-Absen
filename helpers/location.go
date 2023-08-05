@@ -1,13 +1,18 @@
 package helpers
 
 import (
+	"absen/utils"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
+var (
+	GOOGLE_API_KEY string = utils.GetConfig("GOOGLE_API_KEY")
+)
+
 func GetLocation(latitude, longitude string) (string, error) {
-	url := fmt.Sprintf("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=%s&lon=%s", latitude, longitude)
+	url := fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&%s", latitude, longitude, GOOGLE_API_KEY)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err

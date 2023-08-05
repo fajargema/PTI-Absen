@@ -7,6 +7,7 @@ import (
 	"absen/models"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"mime/multipart"
 	"strconv"
 	"time"
@@ -81,19 +82,19 @@ func (pr *PresentRepositoryImpl) GetHomeWidget(token string) (models.HomeWidget,
 	}
 
 	// Get Check-In Location
-	getCheckInLoc, err := helpers.GetLocation(presentInLat.Latitude, presentInLong.Longitude)
-	if err != nil {
-		return models.HomeWidget{}, err
-	}
-	var checkInLoc models.LocationDetails
-	err = json.Unmarshal([]byte(getCheckInLoc), &checkInLoc)
-	if err != nil {
-		return models.HomeWidget{}, err
-	}
-	if checkInLoc.DisplayName == "" {
-		homeWidget.CheckIn.Location = "belum absen"
+	var presentInLoc models.Present
+	if err := config.DB.Preload("User").
+		Select("location").
+		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 0).
+		Order("time DESC").
+		First(&presentInLoc).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			homeWidget.CheckIn.Location = "belum absen"
+		} else {
+			return models.HomeWidget{}, err
+		}
 	} else {
-		homeWidget.CheckIn.Location = checkInLoc.DisplayName
+		homeWidget.CheckIn.Location = presentInLoc.Location
 	}
 
 	// Get Check-Out Last
@@ -145,19 +146,19 @@ func (pr *PresentRepositoryImpl) GetHomeWidget(token string) (models.HomeWidget,
 	}
 
 	// Get Check-Out Location
-	getCheckOutLoc, err := helpers.GetLocation(presentOutLat.Latitude, presentOutLong.Longitude)
-	if err != nil {
-		return models.HomeWidget{}, err
-	}
-	var checkOutLoc models.LocationDetails
-	err = json.Unmarshal([]byte(getCheckOutLoc), &checkOutLoc)
-	if err != nil {
-		return models.HomeWidget{}, err
-	}
-	if checkOutLoc.DisplayName == "" {
-		homeWidget.CheckOut.Location = "belum absen"
+	var presentOutLoc models.Present
+	if err := config.DB.Preload("User").
+		Select("location").
+		Where("date = ? AND user_id = ? AND status = ?", nowFormat, user.ID, 1).
+		Order("time DESC").
+		First(&presentOutLoc).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			homeWidget.CheckOut.Location = "belum absen"
+		} else {
+			return models.HomeWidget{}, err
+		}
 	} else {
-		homeWidget.CheckOut.Location = checkOutLoc.DisplayName
+		homeWidget.CheckOut.Location = presentOutLoc.Location
 	}
 
 	return homeWidget, nil
@@ -266,6 +267,18 @@ func (pr *PresentRepositoryImpl) Create(presentInput models.PresentInput, token 
 		}
 	}
 
+	getLocation, err := helpers.GetLocation(presentInput.Latitude, presentInput.Longitude)
+	if err != nil {
+		return models.Present{}, err
+	}
+	var displayLoc models.GeocodingResponse
+	err = json.Unmarshal([]byte(getLocation), &displayLoc)
+	if err != nil {
+		return models.Present{}, err
+	}
+	fmt.Println(displayLoc.Status)
+	fmt.Println("loc :", displayLoc.Results[4].FormattedAddress)
+
 	var urls []string
 	svc, err := config.CreateS3Client()
 	if err != nil {
@@ -298,6 +311,7 @@ func (pr *PresentRepositoryImpl) Create(presentInput models.PresentInput, token 
 		URL:       string(jsonURLs),
 		Longitude: presentInput.Longitude,
 		Latitude:  presentInput.Latitude,
+		Location:  displayLoc.Results[4].FormattedAddress,
 		Distance:  distanceFormatted,
 		Status:    status,
 		UserID:    user.ID,

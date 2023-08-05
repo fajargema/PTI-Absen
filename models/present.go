@@ -15,6 +15,7 @@ type Present struct {
 	URL       string         `json:"url" form:"url"`
 	Longitude string         `json:"longitude" form:"longitude"`
 	Latitude  string         `json:"latitude" form:"latitude"`
+	Location  string         `json:"location" form:"location"`
 	Distance  string         `json:"distance" form:"distance"`
 	Status    int8           `json:"status" form:"status"`
 	UserID    uint           `json:"user_id" form:"user_id"`
@@ -65,6 +66,7 @@ type PresentInput struct {
 	URL       string    `json:"url" form:"url"`
 	Longitude string    `json:"longitude" form:"longitude" validate:"required"`
 	Latitude  string    `json:"latitude" form:"latitude" validate:"required"`
+	Location  string    `json:"location" form:"location"`
 	Status    int8      `json:"status" form:"status"`
 	UserID    uint      `json:"user_id" form:"user_id"`
 }
