@@ -7,7 +7,6 @@ import (
 	"absen/models"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"mime/multipart"
 	"strconv"
 	"time"
@@ -276,8 +275,6 @@ func (pr *PresentRepositoryImpl) Create(presentInput models.PresentInput, token 
 	if err != nil {
 		return models.Present{}, err
 	}
-	fmt.Println(displayLoc.Status)
-	fmt.Println("loc :", displayLoc.Results[4].FormattedAddress)
 
 	var urls []string
 	svc, err := config.CreateS3Client()

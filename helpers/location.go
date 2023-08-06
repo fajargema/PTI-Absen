@@ -12,7 +12,7 @@ var (
 )
 
 func GetLocation(latitude, longitude string) (string, error) {
-	url := fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&%s", latitude, longitude, GOOGLE_API_KEY)
+	url := fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&key=%s", latitude, longitude, GOOGLE_API_KEY)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
