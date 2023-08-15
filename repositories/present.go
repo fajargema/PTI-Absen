@@ -248,9 +248,13 @@ func (pr *PresentRepositoryImpl) Create(presentInput models.PresentInput, token 
 		return models.Present{}, err
 	}
 
-	status := int8(0)
-	if checkInTime.After(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 12, 0, 0, 0, checkInTime.Location())) {
+	var status int8
+	if checkInTime.After(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 17, 0, 0, 0, checkInTime.Location())) && checkInTime.Before(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 20, 0, 0, 0, checkInTime.Location())) {
 		status = 1
+	} else if checkInTime.After(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 8, 0, 0, 0, checkInTime.Location())) && checkInTime.Before(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 12, 0, 0, 0, checkInTime.Location())) {
+		status = 0
+	} else {
+		return models.Present{}, errors.New("Melebihi jam absen")
 	}
 
 	var count int64

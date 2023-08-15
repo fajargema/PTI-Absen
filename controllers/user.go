@@ -96,7 +96,7 @@ func (uc *UserController) Login(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, models.Response[string]{
 			Status:  "failed",
-			Message: "authentication failed, invalid Email or Password",
+			Message: "authentication failed, invalid Username or Password",
 		})
 	}
 
