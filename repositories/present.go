@@ -249,7 +249,7 @@ func (pr *PresentRepositoryImpl) Create(presentInput models.PresentInput, token 
 	}
 
 	var status int8
-	if checkInTime.After(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 17, 0, 0, 0, checkInTime.Location())) && checkInTime.Before(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 20, 0, 0, 0, checkInTime.Location())) {
+	if checkInTime.After(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 17, 0, 0, 0, checkInTime.Location())) && checkInTime.Before(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 21, 0, 0, 0, checkInTime.Location())) {
 		status = 1
 	} else if checkInTime.After(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 8, 0, 0, 0, checkInTime.Location())) && checkInTime.Before(time.Date(checkInTime.Year(), checkInTime.Month(), checkInTime.Day(), 12, 0, 0, 0, checkInTime.Location())) {
 		status = 0
