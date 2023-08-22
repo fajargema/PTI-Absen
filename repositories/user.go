@@ -116,3 +116,39 @@ func (ur *UserRepositoryImpl) Update(userInput models.UserInput, token string) (
 
 	return user, nil
 }
+
+func (ur *UserRepositoryImpl) ChangePassword(UserInput models.UserChangePassword, token string) (models.User, error) {
+	user, err := m.VerifyToken(token)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	User := models.User{}
+	if err := config.DB.First(&User, user.ID).Error; err != nil {
+		return User, err
+	}
+
+	// Verify old password
+	if err := bcrypt.CompareHashAndPassword([]byte(User.Password), []byte(UserInput.OldPassword)); err != nil {
+		return User, errors.New("invalid old password")
+	}
+
+	// Validate new password and confirm password
+	if UserInput.NewPassword != UserInput.ConfirmPassword {
+		return User, errors.New("new password and confirm password don't match")
+	}
+
+	// Hash the new password
+	newPasswordHash, err := bcrypt.GenerateFromPassword([]byte(UserInput.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return User, err
+	}
+
+	// Update the password
+	User.Password = string(newPasswordHash)
+	if err := config.DB.Save(&User).Error; err != nil {
+		return User, err
+	}
+
+	return User, nil
+}

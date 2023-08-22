@@ -11,6 +11,7 @@ type UserRepository interface {
 	GetByUsername(username string) (models.User, error)
 	Login(UserInput models.UserAuth) (models.UserResponse, error)
 	Update(UserInput models.UserInput, token string) (models.User, error)
+	ChangePassword(UserInput models.UserChangePassword, token string) (models.User, error)
 }
 
 type PresentRepository interface {

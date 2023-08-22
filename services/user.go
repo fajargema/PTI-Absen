@@ -30,3 +30,7 @@ func (us *UserService) Login(userInput models.UserAuth) (models.UserResponse, er
 func (us *UserService) Update(userInput models.UserInput, token string) (models.User, error) {
 	return us.repository.Update(userInput, token)
 }
+
+func (us *UserService) ChangePassword(userInput models.UserChangePassword, token string) (models.User, error) {
+	return us.repository.ChangePassword(userInput, token)
+}

@@ -34,6 +34,7 @@ func New() *echo.Echo {
 	v1.POST("/users/register", user.Register)
 	eJwt.GET("/users/:username", user.GetByUsername)
 	eJwt.PUT("/users", user.Update)
+	eJwt.PUT("/users/password", user.ChangePassword)
 
 	present := controllers.InitPresentController()
 	eJwt.GET("/presents/widget", present.GetHomeWidget)

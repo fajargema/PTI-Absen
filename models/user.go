@@ -25,6 +25,12 @@ type UserInput struct {
 	Password string `json:"password" form:"password" validate:"required,min=5"`
 }
 
+type UserChangePassword struct {
+	OldPassword     string `json:"old_password" form:"old_password" validate:"required,min=5"`
+	NewPassword     string `json:"new_password" form:"new_password" validate:"required,min=5"`
+	ConfirmPassword string `json:"confirm_password" form:"confirm_password" validate:"required,min=5"`
+}
+
 type UserAuth struct {
 	Username string `json:"username" form:"username" validate:"required"`
 	Password string `json:"password" form:"password" validate:"required,min=5"`
