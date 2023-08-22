@@ -51,6 +51,7 @@ func New() *echo.Echo {
 	admin.GET("/users/:id", adminUser.GetByID)
 	admin.POST("/users", adminUser.Create)
 	admin.PUT("/users/:id", adminUser.Update)
+	admin.PUT("/users/password", adminUser.ChangePassword)
 	admin.DELETE("/users/:id", adminUser.Delete)
 
 	adminPresent := adm.InitAdminPresentController()

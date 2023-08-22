@@ -266,3 +266,62 @@ func (auc *AdminUserController) Delete(c echo.Context) error {
 		Message: "user deleted",
 	})
 }
+
+func (auc *AdminUserController) ChangePassword(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	if token == "" {
+		return c.JSON(http.StatusBadRequest, models.Response[string]{
+			Status:  "failed",
+			Message: "Missing token in request header",
+		})
+	}
+	token = strings.ReplaceAll(token, "Bearer ", "")
+
+	allowedRoles := []string{"isAdmin", "isUser"}
+	isAllowed, err := m.IsAllowedRole(token, allowedRoles)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, models.Response[string]{
+			Status:  "failed",
+			Message: "Unauthorized",
+		})
+	}
+
+	if !isAllowed {
+		return c.JSON(http.StatusForbidden, models.Response[string]{
+			Status:  "failed",
+			Message: "Forbidden",
+		})
+	}
+
+	var userInput models.UserChangePassword
+
+	if err := c.Bind(&userInput); err != nil {
+		return c.JSON(http.StatusBadRequest, models.Response[string]{
+			Status:  "failed",
+			Message: "invalid request",
+		})
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(userInput); err != nil {
+		return c.JSON(http.StatusBadRequest, models.Response[string]{
+			Status:  "failed",
+			Message: err.Error(),
+		})
+	}
+
+	user, err := auc.service.ChangePassword(userInput, token)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.Response[string]{
+			Status:  "failed",
+			Message: err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response[models.User]{
+		Status:  "success",
+		Message: "user updated",
+		Data:    user,
+	})
+}

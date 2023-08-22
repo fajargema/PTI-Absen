@@ -10,6 +10,7 @@ type AdminUserRepository interface {
 	GetByID(id, token string) (models.User, error)
 	Create(userInput models.UserInput, token string) (models.User, error)
 	Update(userInput models.UserInput, token, id string) (models.User, error)
+	ChangePassword(UserInput models.UserChangePassword, token string) (models.User, error)
 	Delete(id, token string) error
 }
 

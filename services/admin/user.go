@@ -34,3 +34,7 @@ func (aus *AdminUserService) Update(userInput models.UserInput, token, id string
 func (aus *AdminUserService) Delete(id, token string) error {
 	return aus.repository.Delete(id, token)
 }
+
+func (aus *AdminUserService) ChangePassword(userInput models.UserChangePassword, token string) (models.User, error) {
+	return aus.repository.ChangePassword(userInput, token)
+}
